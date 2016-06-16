@@ -125,7 +125,8 @@ public class AddPbActivity extends AppCompatActivity implements View.OnClickList
         public void run() {
             super.run();
 
-            RequestBody fromBody = new FormBody.Builder().add("data.prodline" , (String)spinner_produce_line.getSelectedItem())
+            RequestBody fromBody = new FormBody.Builder()
+                    .add("data.prodline" , (String)spinner_produce_line.getSelectedItem())
                     .add("data.orderState.code","订单类型")
                     .add("data.emergency" , "否")
                     .add("data.descript","备注")

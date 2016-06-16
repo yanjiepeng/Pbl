@@ -1,8 +1,13 @@
-package com.zk.pbl;
+package com.zk.service;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+
+import com.zk.EventBus.EventA;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -17,7 +22,7 @@ import okhttp3.Response;
 public class UpdatePbService extends Service {
     Timer timer = new Timer();
     OkHttpClient client = new OkHttpClient();
-    private String url;
+    private String url = "http://www.mocky.io/v2/5762466c100000fd0a8b139d";
 
     public UpdatePbService() {
     }
@@ -25,7 +30,7 @@ public class UpdatePbService extends Service {
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        timer.schedule(new UpdateTask() , 0 , 1000);
+        timer.schedule(new UpdateTask() , 100);
     }
 
     @Override
@@ -39,9 +44,7 @@ public class UpdatePbService extends Service {
 
         @Override
         public void run() {
-
            enqueueData();
-
         }
     }
 
@@ -50,14 +53,15 @@ public class UpdatePbService extends Service {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                EventBus.getDefault().post(new EventA("error"));
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-
                     //获取数据传递
+                    String res = response.body().string();
+                    EventBus.getDefault().post(new EventA(res));
                 }
             }
         });

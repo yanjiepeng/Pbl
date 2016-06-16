@@ -86,12 +86,14 @@
             android:layout_height="1px"
             android:background="@color/gray" />
 
-        <ListView
+        <ExpandableListView
             android:id="@+id/lv_pro_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
 
-        </ListView>
+          >
+
+        </ExpandableListView>
 
     </LinearLayout>
 </LinearLayout>
