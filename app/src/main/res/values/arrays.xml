@@ -18,8 +18,7 @@
         <item>7</item>
     </string-array>
     <string-array name="produce_name">
-        <item>产品A</item>
-        <item>产品B</item>
-
+        <item>圆方件</item>
+        <item>方方件</item>
     </string-array>
 </resources>

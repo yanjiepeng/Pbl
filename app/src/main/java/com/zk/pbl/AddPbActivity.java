@@ -1,5 +1,11 @@
 package com.zk.pbl;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.zk.EventBus.EventA;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 
@@ -23,11 +33,13 @@ import okhttp3.Response;
 public class AddPbActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    private Spinner spinner_produce_line , spinner_produce_status , spinner_produce_name , spinner_produce_amount;
+    private Spinner spinner_produce_line, spinner_produce_status, spinner_produce_name, spinner_produce_amount;
     EditText et_info;
-    private Button btn_confirm , btn_cancel;
+    private Button btn_confirm, btn_cancel;
     private OkHttpClient client;
-    private String url;
+    private String url = "http://192.168.7.183:8080/sshe/base/prodorder!notNeedSecurity_add.sy";  //post接口
+    String[] pro_code = {"c2158cb5bc374cdcac759b32f57aed45", "c066bffef2664f589393184aaa6bda27"};
+    ProgressDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +119,12 @@ public class AddPbActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
 
-            case R.id.btn_confirm :
+            case R.id.btn_confirm:
 
-
+                new UploadNewTaskThread().start();
 
                 break;
-            case R.id.btn_cancel :
+            case R.id.btn_cancel:
 
                 AddPbActivity.this.finish();
                 break;
@@ -126,30 +138,74 @@ public class AddPbActivity extends AppCompatActivity implements View.OnClickList
             super.run();
 
             RequestBody fromBody = new FormBody.Builder()
-                    .add("data.prodline" , (String)spinner_produce_line.getSelectedItem())
-                    .add("data.orderState.code","订单类型")
-                    .add("data.emergency" , "否")
-                    .add("data.descript","备注")
-                    .add("orderProd.prod" , "产品名")
-                    .add("orderProd.number","数量")
+                    .add("data.prodline", (spinner_produce_line.getSelectedItemPosition() + 1) + "")
+                    .add("data.orderState.code", "202020")
+                    .add("data.orderType.code", "202020")
+                    .add("data.emergency", "否")
+                    .add("data.descript", et_info.getText().toString())
+                    .add("orderProd.prod", pro_code[spinner_produce_name.getSelectedItemPosition()])
+                    .add("orderProd.number", getResources().getStringArray(R.array.produce_count)[spinner_produce_amount.getSelectedItemPosition()])
                     .build();
+
             Request request = new Request.Builder().url(url).post(fromBody).build();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    pDialog = new ProgressDialog(AddPbActivity.this);
+                    pDialog.setTitle("提交中 ，请稍候");
+                    pDialog.show();
+                }
+            });
+
+
             //响应
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pDialog.dismiss();
+                            new AlertDialog.Builder(AddPbActivity.this)
+                                    .setTitle("消息")
+                                    .setIcon(R.mipmap.failed)
+                                    .setMessage("提交失败，请重试！")
+                                    .setPositiveButton("确定", null)
+                                    .show();
+                        }
+                    });
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
-                        if (response.isSuccessful()) {
+                    if (response.isSuccessful()) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pDialog.dismiss();
+                                new AlertDialog.Builder(AddPbActivity.this)
+                                        .setTitle("消息")
+                                        .setMessage("提交成功")
+                                        .setIcon(R.mipmap.success)
+                                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                AddPbActivity.this.finish();
+                                            }
+                                        })
+                                        .show();
+                            }
+                        });
+                    }
 
-                        }
+                    EventBus.getDefault().post(new EventA("post success"));
                 }
             });
 
 
         }
     }
+
 }

@@ -1,6 +1,8 @@
 package com.zk.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -23,14 +25,20 @@ public class UpdatePbService extends Service {
     Timer timer = new Timer();
     OkHttpClient client = new OkHttpClient();
     private String url = "http://www.mocky.io/v2/5762466c100000fd0a8b139d";
-
+    private String url_x = "http://192.168.7.183:8080/sshe/base/prodorder!notNeedSecurity_orderlist.sy";
     public UpdatePbService() {
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        registerReceiver(new ExitReceiver() , null);
     }
 
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        timer.schedule(new UpdateTask() , 100);
+        new UpdateTask().start();
     }
 
     @Override
@@ -40,7 +48,7 @@ public class UpdatePbService extends Service {
     }
 
 
-    class UpdateTask extends TimerTask {
+    class UpdateTask extends Thread {
 
         @Override
         public void run() {
@@ -49,7 +57,7 @@ public class UpdatePbService extends Service {
     }
 
     private void enqueueData() {
-        Request request = new Request.Builder().url(url).build();
+        Request request = new Request.Builder().url(url_x).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -66,4 +74,15 @@ public class UpdatePbService extends Service {
             }
         });
     }
+
+    /*
+      app退出时关闭服务
+     */
+    class ExitReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            stopSelf(); //关闭服务
+        }
+    }
+
 }

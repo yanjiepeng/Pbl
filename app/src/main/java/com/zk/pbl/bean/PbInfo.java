@@ -9,14 +9,14 @@ public class PbInfo {
 
 
     /**
-     * children : [{"code":"40edd31c889f4180a2926317b4991b76","createdate":"2016-06-16 11:23:59","id":11,"number":2,"prodline":1,"seq":2,"state":"正常"},{"code":"0fdf198ff8434c2380eada3cc66631ba","createdate":"2016-06-16 11:23:59","id":12,"number":2,"prodline":1,"seq":1,"state":"正常"},{"code":"27fcbc3e5efc4c36b01bb923980f1a65","createdate":"2016-06-16 11:23:59","id":13,"number":2,"prodline":1,"seq":3,"state":"正常"}]
-     * code : af01f64eff294a5bbe18f47410477c2c
-     * createdate : 2016-06-16 11:23:59
-     * descript : sdfas
+     * children : [{"code":"f85f17cf85c242a8b4ad2a48db4f549e","createdate":"2016-06-18 12:58:05","id":11,"number":1,"prodline":0,"seq":2,"state":"正常"},{"code":"aea0dab80d1b4d7b8b079efd208dfad5","createdate":"2016-06-18 12:58:05","id":12,"number":1,"prodline":0,"seq":1,"state":"正常"}]
+     * code : fe38a0c8efd2444fa992aa38b0e6face
+     * createdate : 2016-06-18 12:58:05
+     * descript : 圆方件产品
      * emergency : 否
      * id : 1
      * number : 0
-     * prodline : 1
+     * prodline : 0
      * seq : 0
      * state : 正常
      * type : 产品单
@@ -33,11 +33,11 @@ public class PbInfo {
     private String state;
     private String type;
     /**
-     * code : 40edd31c889f4180a2926317b4991b76
-     * createdate : 2016-06-16 11:23:59
+     * code : f85f17cf85c242a8b4ad2a48db4f549e
+     * createdate : 2016-06-18 12:58:05
      * id : 11
-     * number : 2
-     * prodline : 1
+     * number : 1
+     * prodline : 0
      * seq : 2
      * state : 正常
      */

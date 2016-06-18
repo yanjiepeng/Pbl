@@ -24,6 +24,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ExpandableListView lv_pb;
     private Gson gson ;
     private List<PbInfo> data = new ArrayList<PbInfo>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btn_add_new_pb = (Button) findViewById(R.id.btn_add_new_book);
         lv_pb = (ExpandableListView) findViewById(R.id.lv_pro_list);
+        lv_pb.setGroupIndicator(getResources().getDrawable(R.mipmap.open));
         btn_add_new_pb.setOnClickListener(this) ;
     }
 
@@ -64,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         actionBar.setCustomView(R.layout.titlebar);
 
-        actionBar.setIcon(R.drawable.zklogo);
+        actionBar.setIcon(R.mipmap.mjlogo);
 
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME);
 
@@ -75,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.btn_add_new_book :
-                startActivity(new Intent(MainActivity.this , AddPbActivity.class));
-                startService(new Intent(MainActivity.this , UpdatePbService.class));
+                startActivity(new Intent(MainActivity.this, AddPbActivity.class));
+
                 break;
 
         }
@@ -89,6 +92,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onEventMainThread(EventA eventA) {
 
         String msg = eventA.getMsg() ;
+        Type type = new TypeToken<List<PbInfo>>(){}.getType();
+        if (msg.equals("post success")) {
+            startService(new Intent(MainActivity.this , UpdatePbService.class));
+        }
         if (msg.equals("error")) {
             Toast.makeText(MainActivity.this, "网络异常", Toast.LENGTH_SHORT).show();
         }else {
@@ -96,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 数据解析
              */
             if (!msg.isEmpty()) {
-                Type type = new TypeToken<List<PbInfo>>(){}.getType();
+
                 data.clear();
                 data = gson.fromJson(msg , type);
                 PbExpandableAdapter mAdapter = new PbExpandableAdapter(MainActivity.this , data);
@@ -111,4 +118,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sendBroadcast(new Intent(MainActivity.this , UpdatePbService.class));
+    }
 }
